@@ -20,7 +20,14 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.GH_USERNAME }}
           password: ${{ secrets.GH_PAT_GHCR }}
-    
+
+      # Convert tag to lowercase since its required by ghcr
+      - id: ghcr_tag
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ghcr.io/${{ github.repository }}:latest
+
+
       # https://github.com/marketplace/actions/build-and-push-docker-images
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -29,6 +36,7 @@ jobs:
           context: "{{defaultContext}}:app"
           push: true
           # Unclear on the requirement of this tag but saw it referenced multiple times
-          tags: ghcr.io/${{ github.repository }}:latest
+          # This is being made lowercase from the previous step ghcr_tag
+          tags: ${{ steps.ghcr_tag.outputs.lowercase }}
           
       
