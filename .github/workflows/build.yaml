@@ -1,0 +1,34 @@
+---
+name: Docker Image CI for GHCR for our FlaskApp
+
+on: 
+  push
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+        # Latest checkout action
+        # https://github.com/actions/checkout
+      - uses: actions/checkout@v5
+
+      # Login to ghcr action
+      # https://github.com/docker/login-action?tab=readme-ov-file#github-container-registry
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USERNAME }}
+          password: ${{ secrets.GH_PAT_GHCR }}
+    
+      # https://github.com/marketplace/actions/build-and-push-docker-images
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          # Define context since Dockerfile is not in the root
+          context: "{{defaultContext}}:app"
+          push: true
+          # Unclear on the requirement of this tag but saw it referenced multiple times
+          tags: ghcr.io/${{ github.repository }}:latest
+          
+      

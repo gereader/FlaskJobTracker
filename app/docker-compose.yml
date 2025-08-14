@@ -1,5 +1,5 @@
 services:
-  flask-app:
+  flask:
     build: .
     ports:
       - "8080:8080"
