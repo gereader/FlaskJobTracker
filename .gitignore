@@ -1,0 +1,13 @@
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# iCloud generated files
+*.icloud
+
+
+### Ignore SQLite ###
+
+instance/
