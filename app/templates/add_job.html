@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Add New Job Application</h2>
+
+<form method="POST">
+    {# CSRF protection, always include this for security #}
+    {{ form.hidden_tag() }}
+    
+    <p>
+        {{ form.application_date.label }}<br>
+        {{ form.application_date() }}
+    </p>
+    
+    <p>
+        {{ form.company.label }}<br>
+        {{ form.company() }}
+    </p>
+    
+    <p>
+        {{ form.position.label }}<br>
+        {{ form.position() }}
+    </p>
+
+    <p>
+        {{ form.salary.label }}<br>
+        {{ form.salary() }}
+    </p>
+    
+    <p>
+        {{ form.status.label }}<br>
+        {{ form.status() }}
+    </p>
+    
+    <p>
+        {{ form.resume_used.label }}<br>
+        {{ form.resume_used() }}
+    </p>
+
+    <p>
+        {{ form.job_url.label }}<br>
+        {{ form.job_url() }}
+    </p>
+
+    <p>
+        {{ form.job_description.label }}<br>
+        {{ form.job_description() }}
+    </p>
+
+    <p>
+        {{ form.notes.label }}<br>
+        {{ form.notes() }}
+    </p>
+
+    <p>
+        {% if 'edit' in request.endpoint %}
+            <input type="submit" value="Update Job">
+        {% else %}
+            <input type="submit" value="Add Job">
+        {% endif %}
+    </p>
+</form>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Job Application Dashboard</h2>
+
+<!-- Quick Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3 class="stat-label">Total Applications</h3>
+        <div class="stat-number">{{ total_jobs }}</div>
+    </div>
+    
+    {% if statuses %}
+    <div class="stat-card">
+        <h3 class="stat-label">Status Breakdown</h3>
+        {% for status, count in statuses.items() %}
+            <p style="margin: 5px 0; font-size: 14px;">
+                <strong>{{ status }}:</strong> {{ count }}
+            </p>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <h3>Quick Actions</h3>
+    <p>
+        <a href="/add-job" class="btn btn-success">
+            + Add New Job Application
+        </a>
+        <a href="/jobs" class="btn btn-primary">
+            View All Jobs
+        </a>
+    </p>
+</div>
+
+<!-- Recent Applications -->
+{% if recent_jobs %}
+<div class="card">
+    <h3>Recent Applications</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Company</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in recent_jobs %}
+            <tr>
+                <td>{{ job.application_date }}</td>
+                <td>{{ job.company }}</td>
+                <td>{{ job.position }}</td>
+                <td>{{ job.status }}</td>
+                <td>
+                    <a href="/job/{{ job.id }}">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if total_jobs > 5 %}
+        <p>
+            <a href="/jobs">View all {{ total_jobs }} applications →</a>
+        </p>
+    {% endif %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h3>No job applications yet!</h3>
+    <p>Get started by adding your first job application.</p>
+    <a href="/add-job" class="btn btn-success">
+        Add Your First Job
+    </a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Job Application Details</h2>
+
+    <p><a href="/job/{{ job_id }}/edit" class="btn btn-primary">Edit Job</a></p>
+
+    <div class="job-details">
+        <p><strong>Company:</strong> {{ job.company }}</p>
+        <p><strong>Position:</strong> {{ job.position }}</p>
+        <p><strong>Application Date:</strong> {{ job.application_date }}</p>
+        <p><strong>Status:</strong> {{ job.status }}</p>
+        <p><strong>Salary:</strong> {{ job.salary }}</p>
+        <p><strong>Resume Used:</strong> {{ job.resume_used }}</p>
+
+        {% if job.job_url %}
+        <p><strong>Job URL:</strong> <a href="{{ job.job_url }}" target="_blank">{{ job.job_url }}</a></p>
+        {% endif %}
+
+        {% if job.job_description %}
+        <div class="detail-section">
+            <p><strong>Job Description:</strong></p>
+            <div class="detail-content">
+                {{ job.job_description }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if job.notes %}
+        <div class="detail-section">
+            <p><strong>Notes:</strong></p>
+            <div class="detail-content">
+                {{ job.notes }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <p><a href="/jobs" class="btn btn-secondary">← Back to Job List</a></p>
+</div>
+{% endblock %}

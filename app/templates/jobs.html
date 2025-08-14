@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Job Applications</h2>
+
+<div class="filter-form">
+    <form method="GET">
+        <label for="status_filter">Filter by Status:</label>
+        <select name="status" id="status_filter" class="form-control" onchange="this.form.submit()" style="width: auto; display: inline-block; margin-left: 10px;">
+            <option value="">All Jobs</option>
+            <option value="Waiting for Response" {% if request.args.get('status') == 'Waiting for Response' %}selected{% endif %}>Waiting for Response</option>
+            <option value="Interviewing" {% if request.args.get('status') == 'Interviewing' %}selected{% endif %}>Interviewing</option>
+            <option value="Rejected Application" {% if request.args.get('status') == 'Rejected Application' %}selected{% endif %}>Rejected Application</option>
+            <option value="Ghosted Application" {% if request.args.get('status') == 'Ghosted Application' %}selected{% endif %}>Ghosted Application</option>
+        </select>
+    </form>
+</div>
+
+{% if jobs %}
+    <p>Total applications: {{ jobs|length }}</p>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Company</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Salary</th>
+                <th>Resume</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>{{ job.application_date }}</td>
+                <td>{{ job.company }}</td>
+                <td>{{ job.position }}</td>
+                <td>{{ job.status }}</td>
+                <td>{{ job.salary }}</td>
+                <td>{{ job.resume_used }}</td>
+                <td>
+                    <a href="/job/{{ job.id }}">Details</a><br>
+                    <a href="/job/{{ job.id }}/edit">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="empty-state">
+        <h3>No job applications yet!</h3>
+        <p><a href="/add-job" class="btn btn-success">Add your first job!</a></p>
+    </div>
+{% endif %}
+{% endblock %}
