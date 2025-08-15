@@ -5,8 +5,49 @@ on:
   push
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Convert tag to lowercase since its required by ghcr
+      - id: ghcr_tag
+        uses: ASzc/change-string-case-action@v6
+        with:
+          string: ghcr.io/${{ github.repository }}:latest
+
+      # Build container during test
+      - name: Build Docker Image
+        run: docker build -t ${{ steps.ghcr_tag.outputs.lowercase }} app
+
+      # Run container
+      - name: Run container in background
+        run: |
+          docker run -d --name flask-test -p 8080:8080 ${{ steps.ghcr_tag.outputs.lowercase }}
+      
+      # Wait for container to test okay or timeout in 30s
+      - name: Wait for Container Test
+        run: |
+          timeout 30 bash -c 'until curl -f http://localhost:8080/health/live; do sleep 1; done'
+
+      # Readiness check
+      - name: Container Readiness check
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/health/live")
+          if [ "$HTTP_CODE" -eq 200 ]; then
+              echo "Readiness request was successful (HTTP 200 OK)."
+          else
+              echo "Readiness Request failed with HTTP status code: $HTTP_CODE"
+              exit 1
+          fi
+
+      - name: Stop container, test complete
+        run: docker stop flask-test
+
+
   build_and_push:
     runs-on: ubuntu-latest
+    needs: test
     steps:
         # Latest checkout action
         # https://github.com/actions/checkout
