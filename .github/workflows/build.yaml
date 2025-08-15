@@ -28,12 +28,12 @@ jobs:
       # Wait for container to test okay or timeout in 30s
       - name: Wait for Container Test
         run: |
-          timeout 30 bash -c 'until curl -f http://localhost:8080/health/live; do sleep 1; done'
+          timeout 30 bash -c 'until curl -f http://localhost:8080/healthz/live; do sleep 10; done'
 
       # Readiness check
       - name: Container Readiness check
         run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/health/live")
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/healthz/live")
           if [ "$HTTP_CODE" -eq 200 ]; then
               echo "Readiness request was successful (HTTP 200 OK)."
           else
