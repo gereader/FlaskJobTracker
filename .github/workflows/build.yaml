@@ -33,7 +33,7 @@ jobs:
       # Readiness check
       - name: Container Readiness check
         run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/healthz/live")
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/healthz/readiness")
           if [ "$HTTP_CODE" -eq 200 ]; then
               echo "Readiness request was successful (HTTP 200 OK)."
           else
