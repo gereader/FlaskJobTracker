@@ -155,6 +155,22 @@ def job_edit(job_id):
     
     return render_template('edit_job.html', form=form, job=job, job_id=job_id)
 
+
+# Health Checks
+@app.route("/healthz/live")
+def health_live():
+    return "OK", 200
+
+@app.route("/healthz/readiness")
+def health_readiness():
+    try:
+        # Create connection, simple query
+        with db.engine.connect() as connection:
+            connection.execute(db.text("SELECT 1"))
+        return "OK", 200
+    except Exception:
+        return "Not Ready", 500
+
 def create_tables():
     """Create database tables"""
     with app.app_context():
