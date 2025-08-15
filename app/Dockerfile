@@ -1,5 +1,8 @@
 FROM python:3.13-slim
 
+# Link container to repo
+LABEL org.opencontainers.image.source=https://github.com/gereader/FlaskJobTracker
+
 # Set work directory
 WORKDIR /app
 
