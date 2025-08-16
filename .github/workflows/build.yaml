@@ -45,7 +45,7 @@ jobs:
         run: docker stop flask-test
 
 
-  build_and_push:
+  build_and_push_ghcr:
     runs-on: ubuntu-latest
     needs: test
     steps:
@@ -80,4 +80,29 @@ jobs:
           # This is being made lowercase from the previous step ghcr_tag
           tags: ${{ steps.ghcr_tag.outputs.lowercase }}
           
-      
+  build_and_push_ecr:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      # Checkout code
+      - uses: actions/checkout@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.3.1
+        with:
+          aws-access-key-id: ${{ secrets.ECR_USER_KEY }}
+          aws-secret-access-key: ${{ secrets.ECR_USER_KEY_SECRET }}
+          aws-region: us-west-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image to ECR
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:app"
+          push: true
+          tags: "${{ steps.login-ecr.outputs.registry }}/gereader/flaskjobtracker:latest"
+          
+         
