@@ -92,7 +92,8 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.ECR_USER_KEY }}
           aws-secret-access-key: ${{ secrets.ECR_USER_KEY_SECRET }}
-          aws-region: us-west-2
+          aws-region: us-east-1 # ECR Public can only be logged into from us-east-1
+          # https://github.com/marketplace/actions/amazon-ecr-login-action-for-github-actions
 
       - name: Login to Amazon ECR
         id: login-ecr-public
