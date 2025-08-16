@@ -95,6 +95,13 @@ jobs:
           aws-region: us-east-1 # ECR Public can only be logged into from us-east-1
           # https://github.com/marketplace/actions/amazon-ecr-login-action-for-github-actions
 
+      - name: Get ECR Public registry ID
+        id: ecr-public-details
+        # Looks like to set a var you have to echo it into the github_output var, we're going to store the ID from aws cli
+        run: |
+          REGISTRY_ID=$(aws ecr-public describe-registries --region us-east-1 --query 'registries[0].registryId' --output text)
+          echo "id=$REGISTRY_ID" >> $GITHUB_OUTPUT
+
       - name: Login to Amazon ECR
         id: login-ecr-public
         uses: aws-actions/amazon-ecr-login@v2
@@ -106,6 +113,6 @@ jobs:
         with:
           context: "{{defaultContext}}:app"
           push: true
-          tags: "${{ steps.login-ecr-public.outputs.registry }}/gereader/flaskjobtracker:latest"
+          tags: "${{ steps.login-ecr-public.outputs.registry }}/${{ steps.ecr-public-details.outputs.id }}/gereader/flaskjobtracker:latest"
           
-         
+
