@@ -114,6 +114,6 @@ jobs:
           context: "{{defaultContext}}:app"
           push: true
           # Grabbed the URI from the ecr-public-details step to simplify
-          tags: "${{ steps.ecr-public-details.outputs.ur }}/gereader/flaskjobtracker:latest"
+          tags: "${{ steps.ecr-public-details.outputs.uri }}/gereader/flaskjobtracker:latest"
           
 
