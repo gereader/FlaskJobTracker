@@ -123,7 +123,6 @@ jobs:
         # Don't want to hardcode my account ID so using a github secret to work around it
         run: |
           sed -i 's/\${AWS_ACCOUNT_ID}/${{ secrets.AWS_ACCOUNT_ID }}/g' .aws/task_definition.json
-          
 
       - name: Render Amazon ECS task definition
         id: render-web-container
@@ -135,6 +134,8 @@ jobs:
 
       - name: Deploy to Amazon ECS service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        env:
+          AWS_REGION: us-west-2
         with:
           task-definition: ${{ steps.render-web-container.outputs.task-definition }}
           # Service and Cluster Name from AWS
