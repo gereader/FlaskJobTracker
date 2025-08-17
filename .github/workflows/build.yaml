@@ -117,6 +117,26 @@ jobs:
           # Grabbed the URI from the ecr-public-details step to simplify and version tags
           tags: |
             ${{ steps.ecr-public-details.outputs.container_uri }}:latest
-            ${{ steps.ecr-public-details.outputs.container_uri }}:v1.0
+            ${{ steps.ecr-public-details.outputs.container_uri }}:${{ github.sha }}
+
+      - name: Update task definition with account ID
+        # Don't want to hardcode my account ID so using a github secret to work around it
+        run: |
+          sed -i 's/\${AWS_ACCOUNT_ID}/${{ secrets.AWS_ACCOUNT_ID }}/g' .aws/task_definition.json
           
 
+      - name: Render Amazon ECS task definition
+        id: render-web-container
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: .aws/task_definition.json
+          container-name: FlaskJobTracker
+          image: ${{ steps.ecr-public-details.outputs.container_uri }}:${{ github.sha }}
+
+      - name: Deploy to Amazon ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-web-container.outputs.task-definition }}
+          # Service and Cluster Name from AWS
+          service: FlaskJobTracker_port80_v1-service-r77qrc53
+          cluster: FlaskJobTracker-cluster
