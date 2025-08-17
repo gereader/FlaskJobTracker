@@ -157,7 +157,7 @@ def job_edit(job_id):
 
 @app.route("/testpage")
 def test_page():
-    return "This page is only a test, adding an additional value to note a code version.<br>Version: 2"
+    return "This page is only a test, adding an additional value to note a code version.<br>Version: 3"
 
 
 # Health Checks
