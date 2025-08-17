@@ -155,6 +155,10 @@ def job_edit(job_id):
     
     return render_template('edit_job.html', form=form, job=job, job_id=job_id)
 
+@app.route("/testpage")
+def test_page():
+    return "This page is only a test"
+
 
 # Health Checks
 @app.route("/healthz/live")
