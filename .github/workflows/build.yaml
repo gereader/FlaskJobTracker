@@ -99,8 +99,9 @@ jobs:
         id: ecr-public-details
         # Looks like to set a var you have to echo it into the github_output var
         run: |
-          REGISTRY_uri=$(aws ecr-public describe-registries --region us-east-1 --query 'registries[0].registryUri' --output text)
-          echo "uri=$REGISTRY_uri" >> $GITHUB_OUTPUT
+          REGISTRY_URI=$(aws ecr-public describe-registries --region us-east-1 --query 'registries[0].registryUri' --output text)
+          echo "uri=$REGISTRY_URI" >> $GITHUB_OUTPUT
+          echo "container_uri=$REGISTRY_URI/gereader/flaskjobtracker" >> $GITHUB_OUTPUT
 
       - name: Login to Amazon ECR
         id: login-ecr-public
@@ -113,7 +114,10 @@ jobs:
         with:
           context: "{{defaultContext}}:app"
           push: true
-          # Grabbed the URI from the ecr-public-details step to simplify
-          tags: "${{ steps.ecr-public-details.outputs.uri }}/gereader/flaskjobtracker:latest"
+          # Grabbed the URI from the ecr-public-details step to simplify, add sha and version tags
+          tags: |
+            "${{ steps.ecr-public-details.outputs.container_uri }}:latest"
+            "${{ steps.ecr-public-details.outputs.container_uri }}:${{ github.sha }}
+            "${{ steps.ecr-public-details.outputs.container_uri }}:v1.0"
           
 
