@@ -115,8 +115,8 @@ jobs:
           context: "{{defaultContext}}:app"
           push: true
           # Grabbed the URI from the ecr-public-details step to simplify and version tags
-          tags: >-
-            "${{ steps.ecr-public-details.outputs.container_uri }}:latest",
-            "${{ steps.ecr-public-details.outputs.container_uri }}:v1.0"
+          tags: |
+            ${{ steps.ecr-public-details.outputs.container_uri }}:latest
+            ${{ steps.ecr-public-details.outputs.container_uri }}:v1.0
           
 
