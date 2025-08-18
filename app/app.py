@@ -15,6 +15,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# Configuration
 STATUS_CHOICES = [
     ('Waiting for Response', 'Waiting for Response'),
     ('Interviewing', 'Interviewing'),
@@ -26,8 +27,8 @@ RESUME_CHOICES = [
     ('Default Resume', 'Default Resume')
 ]
 
-JOBS_LIST = []
 
+# Models
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     application_date = db.Column(db.Date, nullable=False)
@@ -44,6 +45,8 @@ class Job(db.Model):
     def __repr__(self):
         return f'<Job {self.company} - {self.position}>'
 
+
+# Forms
 class JobForm(FlaskForm):
     application_date = DateField("Application Date", validators=[DataRequired()], default=date.today)
     status = SelectField("Status", choices=STATUS_CHOICES)
@@ -56,13 +59,14 @@ class JobForm(FlaskForm):
     salary = StringField("Salary", validators=[Optional()])
     submit = SubmitField('Add Job')
 
+
+# Routes
 @app.route('/')
 def home():
-    # Dashboard stats
     total_jobs = Job.query.count()
     recent_jobs = Job.query.order_by(Job.application_date.desc()).limit(5).all()
     
-    # Status counts
+    # Get status counts for dashboard
     statuses = {}
     for status_choice in STATUS_CHOICES:
         status = status_choice[0]
@@ -76,57 +80,56 @@ def home():
                          recent_jobs=recent_jobs,
                          statuses=statuses)
 
+
 @app.route('/jobs')
 def jobs():
-    # Get filter parameter from URL
     status_filter = request.args.get('status')
-
+    
     if status_filter:
-        # Filter by status
         all_jobs = Job.query.filter_by(status=status_filter).order_by(Job.application_date.desc()).all()
     else:
-        # Show all jobs
         all_jobs = Job.query.order_by(Job.application_date.desc()).all()
 
     return render_template('jobs.html', title="Jobs", jobs=all_jobs)
 
+
 @app.route('/add-job', methods=["GET", "POST"])
 def add_job():
-    form = JobForm() # Take out job form class
-    if form.validate_on_submit(): # Check if validation passes
+    form = JobForm()
+    
+    if form.validate_on_submit():
         new_job = Job(
-            application_date = form.application_date.data,
-            status = form.status.data,
-            company = form.company.data,
-            position = form.position.data,
-            resume_used = form.resume_used.data,
-            job_url = form.job_url.data,
-            job_description = form.job_description.data,
-            notes = form.notes.data,
-            salary = form.salary.data
+            application_date=form.application_date.data,
+            status=form.status.data,
+            company=form.company.data,
+            position=form.position.data,
+            resume_used=form.resume_used.data,
+            job_url=form.job_url.data,
+            job_description=form.job_description.data,
+            notes=form.notes.data,
+            salary=form.salary.data
         )
-
-        # Save to db
+        
         db.session.add(new_job)
         db.session.commit()
-        return redirect(url_for('jobs')) 
+        return redirect(url_for('jobs'))
 
     return render_template('add_job.html', form=form, title="Add Job")
 
+
 @app.route("/job/<int:job_id>")
 def job_details(job_id):
-    # Get job by ID, or return 404 if not found
     job = Job.query.get_or_404(job_id)
     return render_template("job_details.html", job=job, job_id=job_id)
 
+
 @app.route("/job/<int:job_id>/edit", methods=["GET", "POST"])
 def job_edit(job_id):
-    # Get job or return 404
     job = Job.query.get_or_404(job_id)
     form = JobForm()
 
     if form.validate_on_submit():
-        # Update the existing job with new data
+        # Update job with form data
         job.application_date = form.application_date.data
         job.status = form.status.data
         job.company = form.company.data
@@ -137,11 +140,10 @@ def job_edit(job_id):
         job.notes = form.notes.data
         job.salary = form.salary.data
 
-        # Save changes in db
-        db.session.commit() 
+        db.session.commit()
         return redirect(url_for('job_details', job_id=job_id))
     
-    # Pre-populate form with existing data (on GET request)
+    # Pre-populate form with existing data
     if not form.is_submitted():
         form.application_date.data = job.application_date
         form.status.data = job.status
@@ -155,25 +157,26 @@ def job_edit(job_id):
     
     return render_template('edit_job.html', form=form, job=job, job_id=job_id)
 
-@app.route("/testpage")
-def test_page():
-    return "This page is only a test, adding an additional value to note a code version.<br>Version: 3"
 
-
-# Health Checks
+# Health checks
 @app.route("/healthz/live")
 def health_live():
     return "OK", 200
 
+
 @app.route("/healthz/readiness")
 def health_readiness():
     try:
-        # Create connection, simple query
         with db.engine.connect() as connection:
             connection.execute(db.text("SELECT 1"))
         return "OK", 200
     except Exception:
         return "Not Ready", 500
+
+# Test Page
+@app.route("/test")
+def test():
+    return "This is a test page.<br>Version: 1"
 
 def create_tables():
     """Create database tables"""
@@ -181,6 +184,7 @@ def create_tables():
         db.create_all()
         print("Database tables created!")
 
+
 if __name__ == '__main__':
-    create_tables()  # Create tables when app starts
+    create_tables()
     app.run(debug=True, host='0.0.0.0', port=8080)
