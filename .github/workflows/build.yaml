@@ -1,5 +1,5 @@
 ---
-name: Docker Image CI for GHCR for our FlaskApp
+name: Docker Image CICD for my FlaskApp
 
 on: 
   push
