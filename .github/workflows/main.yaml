@@ -128,7 +128,7 @@ jobs:
         id: render-web-container
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: .aws/task_definition.json
+          task-definition: .aws/task_definition_example.json
           container-name: flask-app
           image: ${{ steps.ecr-public-details.outputs.container_uri }}:${{ github.sha }}
 
